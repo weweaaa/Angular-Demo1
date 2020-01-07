@@ -1,0 +1,20 @@
+.autocomplete {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  width: 400px;
+}
+
+.autocomplete ul {
+  list-style: none;
+  padding: 0;
+}
+
+.autocomplete li {
+  list-style: none;
+}
+
+.autocomplete li.active {
+  background-color: #9999ff;
+  color: white;
+}

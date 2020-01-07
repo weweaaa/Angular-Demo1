@@ -1,0 +1,20 @@
+<div class="autocomplete">
+  <!-- Event Binding & Two-way Binding -->
+  <!-- (keyup)="getSuggestList($event)" -->
+  <input
+    name="keyword" #tKeyword="ngModel"
+    (keydown.arrowdown)="decreaseActiveIdx()"
+    (keydown.arrowup)="increaseActiveIdx()"
+    (keydown.enter)="updateInput()"
+    [(ngModel)]="keyword"
+  />
+  <ul>
+    <li
+      (click)="updateInput()"
+      *ngFor="let item of suggestList; let index = index"
+      [ngClass]="{ active: index === activeIndex }"
+    >
+      {{ item.title }}
+    </li>
+  </ul>
+</div>
