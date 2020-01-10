@@ -1,7 +1,5 @@
-# Angular-Demo
+# Angular-Demo1
 學習 Angular 歷程
-
-### angular-demo
 
 1. 增加 `input` 控制項，並使用 **事件繫結** 綁定事件
     - 使用者輸入事件 `keyup`
