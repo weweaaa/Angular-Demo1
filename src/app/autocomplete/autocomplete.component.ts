@@ -1,15 +1,16 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Post } from 'src/Models/Domain/Post';
-import { finalize, debounceTime } from 'rxjs/operators';
+import { finalize, debounceTime, switchMap } from 'rxjs/operators';
 import { NgModel } from '@angular/forms';
+import { fromEvent, iif, of } from 'rxjs';
 
 @Component({
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
   styleUrls: ['./autocomplete.component.css']
 })
-export class AutocompleteComponent implements AfterViewInit {
+export class AutocompleteComponent implements OnInit {
 
   api = 'http://localhost:3000/posts?title_like=';
 
@@ -17,7 +18,32 @@ export class AutocompleteComponent implements AfterViewInit {
   activeIndex: number = null;   // 紀錄上下鍵動作移動編號
   suggestList: Post[] = [];   // 儲存接收到 get 的物件資料
 
-  @ViewChild('tKeyword', { static: false }) tKeyword: NgModel
+  @ViewChild('tKeyword', { static: true }) tKeyword: NgModel
+
+  ngOnInit(): void {
+    this.tKeyword.valueChanges.pipe(
+      debounceTime(500),
+      switchMap(_ => this.getData(this.keyword))
+    ).subscribe((value: Post[]) => {
+      this.suggestList = value;
+    });
+  }
+
+  /**
+   * 透過 API Get 取得資料集合
+   *
+   * @private
+   * @param {string} url：要帶在 api 後面的查詢條件
+   * @returns 回傳訪問 API 回來的資料內容
+   */
+  private getData(url: string) {
+    return this.http.get(this.api + url).pipe(
+      finalize(() => {  // 使用方式就像是 C# 當中 try catch 最後的 finally
+        // 每一個 request 收到成功 response 隨即結束
+        console.log('complete');
+      })
+    );
+  }
 
   /**
    * 建構子
@@ -25,23 +51,6 @@ export class AutocompleteComponent implements AfterViewInit {
    * @memberof AutocompleteComponent
    */
   constructor(private http: HttpClient) { }
-
-  /**
-   * 使用者輸入事件
-   *
-   * @param: {KeyboardEvent} event
-   */
-  // getSuggestList(event: KeyboardEvent) {
-  //   const target = event.target as HTMLInputElement;
-  //   this.http.get(this.api + target.value).pipe(
-  //     finalize(() => {
-  //       // 每一個 request 收到成功 response 隨即結束
-  //       console.log('complete');
-  //     })
-  //   ).subscribe((value: Post[]) => {
-  //     this.suggestList = value;
-  //   });
-  // }
 
   /**
    * 使用者按向下鍵事件處理
@@ -62,10 +71,14 @@ export class AutocompleteComponent implements AfterViewInit {
    * 使用者按向上鍵事件處理
    */
   increaseActiveIdx() {
-    if (this.activeIndex === null) {
-      this.activeIndex = 0;
+    if (this.activeIndex === 0) {
+      this.activeIndex = this.suggestList.length - 1;
     } else {
-      this.activeIndex -= 1;
+      if (this.activeIndex === null) {
+        this.activeIndex = 0;
+      } else {
+        this.activeIndex -= 1;
+      }
     }
   }
 
@@ -77,20 +90,4 @@ export class AutocompleteComponent implements AfterViewInit {
       this.keyword = this.suggestList[this.activeIndex].title;
     }
   }
-
-  ngAfterViewInit(): void {
-    this.tKeyword.valueChanges.pipe(
-      debounceTime(1000)
-    ).subscribe(intputValue => {
-      this.http.get(this.api + intputValue).pipe(
-        finalize(() => {
-          // 每一個 request 收到成功 response 隨即結束
-          console.log('complete');
-        })
-      ).subscribe((value: Post[]) => {
-        this.suggestList = value;
-      });
-    });
-  }
-
 }

@@ -1,7 +1,13 @@
 # Angular-Demo
 學習 Angular 歷程
 
-### angular-demo
+## Development server
+
+- Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+- Run `json-server -w db.json` for a db json db server. api server Navigate to `http://localhost:3000/`.
+
+## angular-demo1
 
 1. 增加 `input` 控制項，並使用 **事件繫結** 綁定事件
     - 使用者輸入事件 `keyup`
@@ -25,3 +31,10 @@
    - 當使用者滑鼠點擊 左鍵 時，觸發事件更新 `inputValue` 的值
 9.  移除 `keyup` 事件並改用 `Rxjs` 方式做監聽，並調整觸發頻率的優化
 10. 新增`autocomplete` 元件，將部分 `app.component.ts` 的邏輯移植使其成為可重複使用元件
+
+
+## update-demo
+
+1. 新增：當選取到第一筆清單資料時，在按上鍵時，會自動跳到最後一筆的選取位置
+2. 調整：改為在 `OnInit` 時期先取得資料，避免使用多層級的 `subscribe`
+   - 讓程式碼閱讀性更好，就像是寫 `js` 時也避免 `callback` 太多層
